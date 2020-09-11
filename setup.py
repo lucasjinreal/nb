@@ -34,55 +34,30 @@ this_directory = path.abspath(path.dirname(__file__))
 with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-setup(name='alfred-py',
-      version='2.8.0',
-      keywords=['deep learning', 'script helper', 'tools'],
+setup(name='nb-python',
+      version='0.0.1',
+      keywords=['deep learning', 'neural network', 'builder'],
       description='''
-      Alfred is a DeepLearning utility library.
+      nb-python is nerual network builder for quick network prototyping
       ''',
       long_description=long_description,
       long_description_content_type='text/markdown',
       license='Apache 2.0',
       packages=[
-          'alfred',
-          'alfred.dl',
-          'alfred.dl.inference',
-          'alfred.dl.data',
-          'alfred.dl.data.common',
-          'alfred.dl.data.meta',
-          'alfred.dl.torch',
-          'alfred.dl.torch.train',
-          'alfred.dl.torch.distribute',
-          'alfred.dl.torch.runner',
-          'alfred.dl.torch.nn',
-          'alfred.dl.torch.nn.modules',
-          'alfred.dl.torch.ops',
-          'alfred.dl.tf',
-          'alfred.vis',
-          'alfred.modules',
-          'alfred.modules.scrap',
-          'alfred.modules.text',
-          'alfred.modules.vision',
-          'alfred.modules.data',
-          'alfred.modules.cabinet',
-          'alfred.modules',
-          'alfred.fusion',
-          'alfred.vis.image',
-          'alfred.vis.pointcloud',
-          'alfred.utils',
-          'alfred.protos'
+          'nb',
+          'nb.torch',
+          'nb.tf'
       ],
       # package_dir={'alfred': 'alfred'},
       entry_points={
           'console_scripts': [
-              'alfred = alfred.alfred:main'
+              'nb = nb.nb:main'
           ]
       },
       include_package_data=True,
       author="Lucas Jin",
       author_email="jinfagang19@163.com",
-      url='https://github.com/jinfagang/alfred',
+      url='https://github.com/jinfagang/nb',
       platforms='any',
-      install_requires=['colorama', 'requests', 'regex',
-                        'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml']
+      install_requires=['colorama', 'requests', 'regex']
       )
