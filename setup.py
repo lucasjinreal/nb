@@ -46,9 +46,11 @@ setup(name='nb-python',
       packages=[
           'nb',
           'nb.torch',
+          'nb.torch.backbones',
+          'nb.torch.base',
+          'nb.torch.blocks',
           'nb.tf'
       ],
-      # package_dir={'alfred': 'alfred'},
       entry_points={
           'console_scripts': [
               'nb = nb.nb:main'

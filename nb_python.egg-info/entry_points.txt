@@ -1,0 +1,3 @@
+[console_scripts]
+nb = nb.nb:main
+

@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.cfg
+setup.py
+nb/nb.py
+nb_python.egg-info/PKG-INFO
+nb_python.egg-info/SOURCES.txt
+nb_python.egg-info/dependency_links.txt
+nb_python.egg-info/entry_points.txt
+nb_python.egg-info/requires.txt
+nb_python.egg-info/top_level.txt
