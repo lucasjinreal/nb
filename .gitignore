@@ -1,0 +1,10 @@
+.idea/
+build/
+alfred_py.egg-info/
+alfred.egg-info/
+dist/
+build/
+.vscode/
+vendor/
+
+*.pyc
