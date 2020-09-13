@@ -40,7 +40,7 @@ def build_activation_layer(cfg):
     """
     assert isinstance(cfg, dict) and 'type' in cfg
     cfg_ = cfg.copy()
-
+    
     layer_type = cfg_.pop('type')
     if layer_type not in activation_cfg:
         raise KeyError('Unrecognized activation type {}'.format(layer_type))
@@ -48,6 +48,5 @@ def build_activation_layer(cfg):
         activation = activation_cfg[layer_type]
         if activation is None:
             raise NotImplementedError
-
     layer = activation(**cfg_)
     return layer
