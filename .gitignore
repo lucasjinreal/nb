@@ -8,3 +8,4 @@ build/
 vendor/
 
 *.pyc
+*.egg-info/

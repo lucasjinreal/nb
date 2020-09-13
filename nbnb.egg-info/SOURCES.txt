@@ -9,10 +9,10 @@ nb/torch/backbones/spinenet.py
 nb/torch/base/__init__.py
 nb/torch/base/act.py
 nb/torch/base/conv.py
-nb/torch/base/conv_block.py
 nb/torch/base/conv_ws.py
 nb/torch/base/norm.py
 nb/torch/base/weight_init.py
+nb/torch/blocks/conv_blocks.py
 nb/torch/blocks/csp_blocks.py
 nb/torch/blocks/res_blocks.py
 nb/torch/blocks/spp_blocks.py
