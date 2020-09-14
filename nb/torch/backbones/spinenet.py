@@ -169,6 +169,7 @@ class SpineNet(nn.Module):
                  zero_init_residual=True,
                  activation='relu'):
         super(SpineNet, self).__init__()
+        assert arch in SCALING_MAP.keys(), 'avaliable arch: {}'.format(SCALING_MAP.keys())
         self._block_specs = build_block_specs()[2:]
         self._endpoints_num_filters = SCALING_MAP[arch]['endpoints_num_filters']
         self._resample_alpha = SCALING_MAP[arch]['resample_alpha']
