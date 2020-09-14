@@ -49,6 +49,7 @@ class ConvBase(nn.Module):
                  dilation=1,
                  groups=1,
                  bias='auto',
+                 autopad=True,
                  conv_cfg=None,
                  norm_cfg=None,
                  act_cfg=dict(type='ReLU', inplace=True),
@@ -74,7 +75,7 @@ class ConvBase(nn.Module):
         if self.with_norm and self.with_bias:
             warnings.warn('ConvModule has norm and bias at the same time')
 
-        if padding is None:
+        if padding is None and autopad:
             padding = self.autopad(kernel_size, padding)
 
         # build convolution layer

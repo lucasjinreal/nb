@@ -109,10 +109,10 @@ class Resample(nn.Module):
         new_in_channels = int(in_channels * alpha)
         if block_type == Bottleneck:
             in_channels *= 4
-        self.squeeze_conv = ConvBase(in_channels, new_in_channels, 1, norm_cfg=norm_cfg)
+        self.squeeze_conv = ConvBase(in_channels, new_in_channels, 1, autopad=False, norm_cfg=norm_cfg)
         if scale < 1:
-            self.downsample_conv = ConvBase(new_in_channels, new_in_channels, 3, padding=1, stride=2, norm_cfg=norm_cfg)
-        self.expand_conv = ConvBase(new_in_channels, out_channels, 1, norm_cfg=norm_cfg, act_cfg=None)
+            self.downsample_conv = ConvBase(new_in_channels, new_in_channels, 3, padding=1, stride=2, autopad=False, norm_cfg=norm_cfg)
+        self.expand_conv = ConvBase(new_in_channels, out_channels, 1, autopad=False, norm_cfg=norm_cfg, act_cfg=None)
 
     def _resize(self, x):
         if self.scale == 1:
@@ -224,6 +224,7 @@ class SpineNet(nn.Module):
                 self.endpoint_convs[str(block_spec.level)] = ConvBase(in_channels,
                                                                    self._endpoints_num_filters,
                                                                    kernel_size=1,
+                                                                   autopad=False, 
                                                                    norm_cfg=self.norm_cfg,
                                                                    act_cfg=None)
 
