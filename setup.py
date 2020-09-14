@@ -34,11 +34,11 @@ this_directory = path.abspath(path.dirname(__file__))
 with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-setup(name='nb-python',
-      version='0.0.2',
+setup(name='nbnb',
+      version='0.0.3',
       keywords=['deep learning', 'neural network', 'builder'],
       description='''
-      nb-python is nerual network builder for quick network prototyping
+      nb is nerual network builder for quick network prototyping
       ''',
       long_description=long_description,
       long_description_content_type='text/markdown',

@@ -8,6 +8,18 @@ this project is under construct for now, I will update it quickly once I found s
 
 
 
+## Install
+
+**nb** can be installed from PIP, remember the name is `nbnb`:
+
+```
+sudo pip3 install nbnb
+```
+
+
+
+
+
 ## Usage
 
 Here is an example of using NB to build YoloV5!
@@ -40,7 +52,7 @@ Be note that, the reason for us using `cfg` to specific norm and activation is f
   model = SpineNet()
   ```
   
-  
+  ​
   
 - **2020.09.11**: New added blocks:
 
@@ -65,7 +77,6 @@ We list all `conv` and `block` support in **nb** here:
   - ...
 - `Blocks`:
   - CSPBlock: 
-  
 
 
 

@@ -1,11 +1,11 @@
 import warnings
 
 import torch.nn as nn
-from .weight_init import constant_init, kaiming_init
 
-from .act import build_activation_layer
-from .conv import build_conv_layer
-from .norm import build_norm_layer
+from ..base import constant_init, kaiming_init
+from ..base import build_activation_layer
+from ..base import build_conv_layer
+from ..base import build_norm_layer
 
 
 """
@@ -45,14 +45,13 @@ class ConvBase(nn.Module):
                  out_channels,
                  kernel_size,
                  stride=1,
-                 padding=0,
+                 padding=None,
                  dilation=1,
                  groups=1,
                  bias='auto',
                  conv_cfg=None,
                  norm_cfg=None,
-                 act_cfg=dict(type='ReLU'),
-                 inplace=True,
+                 act_cfg=dict(type='ReLU', inplace=True),
                  order=('conv', 'norm', 'act')):
         super(ConvBase, self).__init__()
         assert conv_cfg is None or isinstance(conv_cfg, dict)
@@ -61,7 +60,6 @@ class ConvBase(nn.Module):
         self.conv_cfg = conv_cfg
         self.norm_cfg = norm_cfg
         self.act_cfg = act_cfg
-        self.inplace = inplace
         self.order = order
         assert isinstance(self.order, tuple) and len(self.order) == 3
         assert set(order) == set(['conv', 'norm', 'act'])
@@ -75,6 +73,9 @@ class ConvBase(nn.Module):
 
         if self.with_norm and self.with_bias:
             warnings.warn('ConvModule has norm and bias at the same time')
+
+        if padding is None:
+            padding = self.autopad(kernel_size, padding)
 
         # build convolution layer
         self.conv = build_conv_layer(
@@ -111,7 +112,6 @@ class ConvBase(nn.Module):
         # build activation layer
         if self.with_activation:
             act_cfg_ = act_cfg.copy()
-            act_cfg_.setdefault('inplace', inplace)
             self.activate = build_activation_layer(act_cfg_)
 
         # Use msra init by default
@@ -139,3 +139,10 @@ class ConvBase(nn.Module):
             elif layer == 'act' and activate and self.with_activation:
                 x = self.activate(x)
         return x
+
+    @staticmethod
+    def autopad(k, p=None):  # kernel, padding
+        # Pad to 'same'
+        if p is None:
+            p = k // 2 if isinstance(k, int) else [x // 2 for x in k]  # auto-pad
+        return p
