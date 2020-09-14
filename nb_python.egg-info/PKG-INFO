@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: nb-python
-Version: 0.0.1
+Version: 0.0.2
 Summary: 
       nb-python is nerual network builder for quick network prototyping
       
@@ -26,19 +26,62 @@ Description: # NB
         
         ```
         
+        A simple example to build a layer of conv:
         
+        ```python
+        from nb.torch.base.conv_block import ConvBase
+        
+        a = ConvBase(128, 256, 3, 1, 2, norm_cfg=dict(type="BN"), act_cfg=dict(type="Hardswish"))
+        
+        ```
+        Be note that, the reason for us using `cfg` to specific norm and activation is for users dynamically switch their configuration of model in yaml format rather than hard code it.
         
         
         
         ## Updates
         
-        - **2020.09.11**: new added blocks:
+        - **2020.09.12**: New backbone SpineNet added:
         
-          ```
-          CSPBottleneck
-          ```
-        
+          SpineNet is a backbone model specific for detection, it's a backbone but can do FPN's thing!! More info pls reference google's paper [link](https://ai.googleblog.com/2020/06/spinenet-novel-architecture-for-object.html).
           
+          ```python
+          from nb.torch.bakbones.spinenet import SpineNet
+          
+          model = SpineNet()
+          ```
+          
+          
+          
+        - **2020.09.11**: New added blocks:
+        
+          ```
+          resnet.Bottleneck
+          resnet.BasicBlock
+          
+          ConvBase
+          ```
+        
+        
+        
+        
+        
+        ## Support Matrix
+        
+        We list all `conv` and `block` support in **nb** here:
+        
+        - `conv`:
+          - Conv
+          - ConvWS: https://arxiv.org/pdf/1903.10520.pdf
+          - ...
+        - `Blocks`:
+          - CSPBlock: 
+          
+        
+        
+        
+        ## Copyright
+        
+        @Lucas Jin all rights reserved.
 Keywords: deep learning,neural network,builder
 Platform: any
 Description-Content-Type: text/markdown
