@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .resnet import BasicBlock, Bottleneck, make_res_layer
-from ..base import ConvBase
+from ..blocks.conv_blocks import ConvBase
 from ..base import constant_init, kaiming_init
 from torch.nn.modules.batchnorm import _BatchNorm
 
