@@ -75,8 +75,10 @@ class ConvBase(nn.Module):
         if self.with_norm and self.with_bias:
             warnings.warn('ConvModule has norm and bias at the same time')
 
-        if padding is None and autopad:
+        if autopad:
             padding = self.autopad(kernel_size, padding)
+        elif padding is None:
+            padding = 0
 
         # build convolution layer
         self.conv = build_conv_layer(
