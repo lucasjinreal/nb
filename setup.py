@@ -35,7 +35,7 @@ with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='nbnb',
-      version='0.0.3',
+      version='0.0.4',
       keywords=['deep learning', 'neural network', 'builder'],
       description='''
       nb is nerual network builder for quick network prototyping
@@ -49,6 +49,7 @@ setup(name='nbnb',
           'nb.torch.backbones',
           'nb.torch.base',
           'nb.torch.blocks',
+          'nb.torch.utils',
           'nb.tf'
       ],
       entry_points={
