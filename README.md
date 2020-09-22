@@ -114,17 +114,36 @@ a = ConvBase(128, 256, 3, 1, 2, norm_cfg=dict(type="BN"), act_cfg=dict(type="Har
 ```
 Be note that, the reason for us using `cfg` to specific norm and activation is for users dynamically switch their configuration of model in yaml format rather than hard code it.
 
+A simple example of using GhostNet:
+
+```python
+from nb.torch.backbones.ghostnet import GhostNet
+
+m = GhostNet(num_classes=8)
+
+# if you want FPN output
+m = GhostNet(fpn_levels=[4, 5, 6])
+```
+
+A simple example of using MobilenetV3:
+
+```python
+from nb.torch.backbones.mobilenetv3_new import MobilenetV3_Small
+```
+
+
+
 
 
 ## Updates
+
+- **2020.09.22**: New backbone of `Ghostnet` and `MobilenetV3` included. Both of them can be used to replace any of your application's backbone.
 
 - **2020.09.14**: We release a primary version of 0.04, which you can build a simple YoloV5 with **nb** easily!
 
   ```shell
   pip install nbnb
   ```
-  
-  
   
 - **2020.09.12**: New backbone SpineNet added:
 
@@ -135,8 +154,6 @@ Be note that, the reason for us using `cfg` to specific norm and activation is f
   
   model = SpineNet()
   ```
-  
-  
   
 - **2020.09.11**: New added blocks:
 

@@ -10,6 +10,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+from nb.torch.blocks.trans_blocks import Focus
 
 
 """
@@ -170,21 +171,30 @@ class GhostBottleneck(nn.Module):
 
 
 class GhostNet(nn.Module):
-    def __init__(self, cfgs, num_classes=1000, width=1.0, dropout=0.2):
+    def __init__(self, cfgs, num_classes=None, width=1.0, dropout=0.2, fpn_levels=None, focus=False):
         super(GhostNet, self).__init__()
+
+        self.with_classifier = num_classes != None
+        self.fpn_levels = fpn_levels
+
         # setting of inverted residual blocks
         self.cfgs = cfgs
         self.dropout = dropout
 
-        # building first layer
-        output_channel = _make_divisible(16 * width, 4)
-        self.conv_stem = nn.Conv2d(3, output_channel, 3, 2, 1, bias=False)
-        self.bn1 = nn.BatchNorm2d(output_channel)
-        self.act1 = nn.ReLU(inplace=True)
-        input_channel = output_channel
+        self.focus = focus
+        if not self.focus:
+            # building first layer
+            output_channel = _make_divisible(16 * width, 4)
+            self.conv_stem = nn.Conv2d(3, output_channel, 3, 2, 1, bias=False)
+            self.bn1 = nn.BatchNorm2d(output_channel)
+            self.act1 = nn.ReLU(inplace=True)
+            input_channel = output_channel
+        else:
+            self.focus = Focus(3, 16, 3, 2, 1)
 
         # building inverted residual blocks
         stages = []
+        all_layers = []
         block = GhostBottleneck
         for cfg in self.cfgs:
             layers = []
@@ -195,33 +205,53 @@ class GhostNet(nn.Module):
                               se_ratio=se_ratio))
                 input_channel = output_channel
             stages.append(nn.Sequential(*layers))
+            all_layers.extend(layers)
 
         output_channel = _make_divisible(exp_size * width, 4)
         stages.append(nn.Sequential(ConvBnAct(input_channel, output_channel, 1)))
+        if self.with_classifier:
+            all_layers.append(ConvBnAct(input_channel, output_channel, 1))
         input_channel = output_channel
         
+        self.all_layers = nn.Sequential(*all_layers)
         self.blocks = nn.Sequential(*stages)        
 
-        # building last several layers
-        output_channel = 1280
-        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))
-        self.conv_head = nn.Conv2d(input_channel, output_channel, 1, 1, 0, bias=True)
-        self.act2 = nn.ReLU(inplace=True)
-        self.classifier = nn.Linear(output_channel, num_classes)
+        if self.with_classifier:
+            # building last several layers
+            output_channel = 1280
+            self.global_pool = nn.AdaptiveAvgPool2d((1, 1))
+            self.conv_head = nn.Conv2d(input_channel, output_channel, 1, 1, 0, bias=True)
+            self.act2 = nn.ReLU(inplace=True)
+            self.classifier = nn.Linear(output_channel, num_classes)
 
     def forward(self, x):
-        x = self.conv_stem(x)
-        x = self.bn1(x)
-        x = self.act1(x)
-        x = self.blocks(x)
-        x = self.global_pool(x)
-        x = self.conv_head(x)
-        x = self.act2(x)
-        x = x.view(x.size(0), -1)
-        if self.dropout > 0.:
-            x = F.dropout(x, p=self.dropout, training=self.training)
-        x = self.classifier(x)
-        return x
+        if self.focus:
+            x = self.focus(x)
+        else:
+            x = self.conv_stem(x)
+            x = self.bn1(x)
+            x = self.act1(x)
+        
+        fpn_outputs = []
+    
+        for i, l in enumerate(self.all_layers):
+            x = l(x)
+            if self.fpn_levels:
+                if i in self.fpn_levels:
+                    fpn_outputs.append(x)
+        
+        if self.with_classifier:
+            x = self.global_pool(x)
+            x = self.conv_head(x)
+            x = self.act2(x)
+            x = x.view(x.size(0), -1)
+            if self.dropout > 0.:
+                x = F.dropout(x, p=self.dropout, training=self.training)
+            x = self.classifier(x)
+            return x
+        else:
+            fpn_outputs.insert(0, x)
+            return fpn_outputs
 
 
 def ghostnet(**kwargs):
@@ -237,12 +267,12 @@ def ghostnet(**kwargs):
         [[3,  72,  24, 0, 1]],
         # stage3
         [[5,  72,  40, 0.25, 2]],
-        [[5, 120,  40, 0.25, 1]],
+        [[5, 120,  40, 0.25, 1]], # 5
         # stage4
         [[3, 240,  80, 0, 2]],
         [[3, 200,  80, 0, 1],
          [3, 184,  80, 0, 1],
-         [3, 184,  80, 0, 1],
+         [3, 184,  80, 0, 1], # 8
          [3, 480, 112, 0.25, 1],
          [3, 672, 112, 0.25, 1]
         ],
@@ -251,7 +281,7 @@ def ghostnet(**kwargs):
         [[5, 960, 160, 0, 1],
          [5, 960, 160, 0.25, 1],
          [5, 960, 160, 0, 1],
-         [5, 960, 160, 0.25, 1]
+         [5, 960, 160, 0.25, 1] # 15
         ]
     ]
     return GhostNet(cfgs, **kwargs)
