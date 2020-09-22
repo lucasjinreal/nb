@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import init
 
+from nb.torch.blocks.trans_blocks import Focus
 
 """
 
@@ -156,14 +157,17 @@ class MobileNetV3_Large(nn.Module):
 
 
 class MobileNetV3_Small(nn.Module):
-    def __init__(self, num_classes=None, fpn_levels=None):
+    def __init__(self, num_classes=None, fpn_levels=None, focus=False):
         super(MobileNetV3_Small, self).__init__()
         self.with_classifier = num_classes != None
         self.fpn_levels = fpn_levels
-
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=2, padding=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(16)
-        self.hs1 = hswish()
+        self.focus = focus
+        if not self.focus:
+            self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=2, padding=1, bias=False)
+            self.bn1 = nn.BatchNorm2d(16)
+            self.hs1 = hswish()
+        else:
+            self.focus = Focus(3, 16, 3, 2, 1)
 
         self.bneck = nn.Sequential(
             Block(3, 16, 16, 16, nn.ReLU(inplace=True), SeModule(16), 2),
@@ -205,7 +209,11 @@ class MobileNetV3_Small(nn.Module):
                     init.constant_(m.bias, 0)
 
     def forward(self, x):
-        x = self.hs1(self.bn1(self.conv1(x)))
+        # replace this with Focus layer
+        if self.focus:
+            x = self.focus(x)
+        else:
+            x = self.hs1(self.bn1(self.conv1(x)))
 
         fpn_outputs = []
         for i, l in enumerate(self.bneck):
