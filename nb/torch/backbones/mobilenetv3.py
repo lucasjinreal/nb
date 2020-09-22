@@ -9,6 +9,17 @@ import torch.nn as nn
 import math
 
 
+"""
+
+this implementation from: https://github.com/d-li14/mobilenetv3.pytorch
+it says this implementation have some errors, this highest is 74.28
+while another repo is 75.45
+
+Once verified on detection tasks, this might be deperacated.
+
+"""
+
+
 __all__ = ['mobilenetv3_large', 'mobilenetv3_small']
 
 
@@ -247,3 +258,12 @@ def mobilenetv3_small(**kwargs):
     ]
 
     return MobileNetV3(cfgs, mode='small', **kwargs)
+
+
+"""
+
+tested log on training YoloV5 with mobilenetv3 backbone
+
+
+
+"""
