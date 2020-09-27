@@ -54,6 +54,8 @@ class BasicBlock(nn.Module):
         self.stride = stride
         self.dilation = dilation
 
+        # TODO: add CBAM here
+
     @property
     def norm1(self):
         return getattr(self, self.norm1_name)
