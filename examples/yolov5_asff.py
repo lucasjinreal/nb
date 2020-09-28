@@ -1,37 +1,14 @@
-# NB
 
-Nenural network Blocks (aka: **NB**, or neural network builder). This library provides massive fancy blocks for you for quick import to build your powerful. Some SOTA tricks and connections such as CSP, ASFF, Attention, BaseConv, Hardswish, all included for quick prototype your model.
-
-**nb** is an idea comes from engineering, we build model with some common blocks, we exploring new ideas with SOTA tricks, but all those thing can be gathered into one single place, and for model quick design and prototyping.
-
-this project is under construct for now, I will update it quickly once I found some new blocks that really works in model. Also, every single updated block will be recorded in updates.
-
-
-
-## Install
-
-**nb** can be installed from PIP, remember the name is `nbnb`:
-
-```
-sudo pip3 install nbnb
-```
-
-
-
-## Usage
-
-Here is an example of using NB to build YoloV5! 
-
-**updates**: We have another YoloV5-ASFF version added in example!
-
-```python
 import torch
 from torch import nn
+
 from nb.torch.blocks.bottleneck_blocks import SimBottleneckCSP
 from nb.torch.blocks.trans_blocks import Focus
 from nb.torch.blocks.head_blocks import SPP
 from nb.torch.blocks.conv_blocks import ConvBase
+from nb.torch.blocks.asff_blocks import ASFFV5 as ASFF
 from nb.torch.utils import device
+
 
 class YoloV5(nn.Module):
 
@@ -53,6 +30,11 @@ class YoloV5(nn.Module):
         self.conv4 = ConvBase(512//cd, 1024//cd, 3, 2)
         self.spp = SPP(1024//cd, 1024//cd)
         self.csp4 = SimBottleneckCSP(1024//cd, 1024//cd, n=3//wd, shortcut=False)
+
+        # asff
+        self.l0_fusion = ASFF(level=0, multiplier=1/cd)
+        self.l1_fusion = ASFF(level=1, multiplier=1/cd)
+        self.l2_fusion = ASFF(level=2, multiplier=1/cd)
 
         # PANet
         self.conv5 = ConvBase(1024//cd, 512//cd)
@@ -105,86 +87,21 @@ class YoloV5(nn.Module):
     def forward(self, x):
         p3, p4, p5, feas = self._build_backbone(x)
         xs, xm, xl = self._build_head(p3, p4, p5, feas)
+        xl = self.l0_fusion(xl, xm, xs)
+        xm = self.l1_fusion(xl, xm, xs)
+        xs = self.l2_fusion(xl, xm, xs)
         return xs, xm, xl
-```
-
-A simple example to build a layer of conv:
-
-```python
-from nb.torch.base.conv_block import ConvBase
-a = ConvBase(128, 256, 3, 1, 2, norm_cfg=dict(type="BN"), act_cfg=dict(type="Hardswish"))
-```
-Be note that, the reason for us using `cfg` to specific norm and activation is for users dynamically switch their configuration of model in yaml format rather than hard code it.
-
-A simple example of using GhostNet:
-
-```python
-from nb.torch.backbones.ghostnet import GhostNet
-
-m = GhostNet(num_classes=8)
-
-# if you want FPN output
-m = GhostNet(fpn_levels=[4, 5, 6])
-```
-
-A simple example of using MobilenetV3:
-
-```python
-from nb.torch.backbones.mobilenetv3_new import MobilenetV3_Small
-```
 
 
+if __name__ == "__main__":
+    a = torch.randn([1, 3, 512, 512]).to(device)
 
+    anchors = [[4, 6,  5, 12,  8, 8],
+               [13, 12,  8, 20,  13, 31],
+               [32, 20,  18, 42,  28, 59]]
+    model = YoloV5(anchors=anchors).to(device)
 
-
-## Updates
-
-- **2020.09.28**: ASFF module added inside **nb**. We have a ASFF design version of YoloV5 now! Some experiment will add here once we confirm ASFF module enhance the model performance.
-
-- **2020.09.22**: New backbone of `Ghostnet` and `MobilenetV3` included. Both of them can be used to replace any of your application's backbone.
-
-- **2020.09.14**: We release a primary version of 0.04, which you can build a simple YoloV5 with **nb** easily!
-
-  ```shell
-  pip install nbnb
-  ```
-  
-- **2020.09.12**: New backbone SpineNet added:
-
-  SpineNet is a backbone model specific for detection, it's a backbone but can do FPN's thing!! More info pls reference google's paper [link](https://ai.googleblog.com/2020/06/spinenet-novel-architecture-for-object.html).
-  
-  ```python
-  from nb.torch.bakbones.spinenet import SpineNet
-  
-  model = SpineNet()
-  ```
-  
-- **2020.09.11**: New added blocks:
-
-  ```
-  resnet.Bottleneck
-  resnet.BasicBlock
-  
-  ConvBase
-  ```
-
-
-
-
-
-## Support Matrix
-
-We list all `conv` and `block` support in **nb** here:
-
-- `conv`:
-  - Conv
-  - ConvWS: https://arxiv.org/pdf/1903.10520.pdf
-  - ...
-- `Blocks`:
-  - CSPBlock: 
-
-
-
-## Copyright
-
-@Lucas Jin all rights reserved.
+    o = model(a)
+    for a in o:
+        print(a.shape)
+    print('this is the output of yolov5 to be sent to Detect layer')
