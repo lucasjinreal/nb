@@ -104,7 +104,7 @@ class MobileNetV3_Large(nn.Module):
             Block(3, 112, 672, 112, hswish(), SeModule(112), 1),
             Block(5, 112, 672, 160, hswish(), SeModule(160), 1),
             Block(5, 160, 672, 160, hswish(), SeModule(160), 2),
-            Block(5, 160, 960, 160, hswish(), SeModule(160), 1),
+            Block(5, 160, 960, 160, hswish(), SeModule(160), 1), # 14
         )
 
 

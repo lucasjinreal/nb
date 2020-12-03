@@ -29,7 +29,8 @@ class YoloV5(nn.Module):
         self.csp3 = SimBottleneckCSP(512//cd, 512//cd, n=9//wd)
         self.conv4 = ConvBase(512//cd, 1024//cd, 3, 2)
         self.spp = SPP(1024//cd, 1024//cd)
-        self.csp4 = SimBottleneckCSP(1024//cd, 1024//cd, n=3//wd, shortcut=False)
+        self.csp4 = SimBottleneckCSP(
+            1024//cd, 1024//cd, n=3//wd, shortcut=False)
 
         # asff
         self.l0_fusion = ASFF(level=0, multiplier=1/cd)
@@ -39,7 +40,8 @@ class YoloV5(nn.Module):
         # PANet
         self.conv5 = ConvBase(1024//cd, 512//cd)
         self.up1 = nn.Upsample(scale_factor=2)
-        self.csp5 = SimBottleneckCSP(1024//cd, 512//cd, n=3//wd, shortcut=False)
+        self.csp5 = SimBottleneckCSP(
+            1024//cd, 512//cd, n=3//wd, shortcut=False)
 
         self.conv6 = ConvBase(512//cd, 256//cd)
         self.up2 = nn.Upsample(scale_factor=2)
@@ -49,7 +51,8 @@ class YoloV5(nn.Module):
         self.csp7 = SimBottleneckCSP(512//cd, 512//cd, n=3//wd, shortcut=False)
 
         self.conv8 = ConvBase(512//cd, 512//cd, 3, 2)
-        self.csp8 = SimBottleneckCSP(512//cd, 1024//cd, n=3//wd, shortcut=False)
+        self.csp8 = SimBottleneckCSP(
+            512//cd, 1024//cd, n=3//wd, shortcut=False)
 
     def _build_backbone(self, x):
         x = self.focus(x)
