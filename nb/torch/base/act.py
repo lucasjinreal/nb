@@ -23,7 +23,8 @@ activation_cfg = {
     'SELU': nn.SELU,
     'CELU': nn.CELU,
     # new added
-    'Hardswish': nn.Hardswish  # check pytorch version, >= 1.6
+    'Hardswish': nn.Hardswish,  # check pytorch version, >= 1.6
+    'SiLU': nn.SiLU  # check pytorch version, >= 1.7
 }
 
 

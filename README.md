@@ -139,6 +139,15 @@ from nb.torch.backbones.mobilenetv3_new import MobilenetV3_Small
 
 ## Updates
 
+- **2021.01.14**: Adding SiLU introduced from pytorch 1.7. And now you can build a activation layer by using:
+
+  ```python
+  from nb.torch.base import build_activation_layer
+  act = build_activation_layer(act_cfg=dict(type='SiLU'))
+  ```
+
+  Also PANet module also provided now. BiFPN is on the way. We will also provide more examples on how to using it!
+
 - **2020.09.28**: ASFF module added inside **nb**. We have a ASFF design version of YoloV5 now! Some experiment will add here once we confirm ASFF module enhance the model performance.
 
 - **2020.09.22**: New backbone of `Ghostnet` and `MobilenetV3` included. Both of them can be used to replace any of your application's backbone.
