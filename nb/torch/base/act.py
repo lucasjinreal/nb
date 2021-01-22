@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch.nn.functional as F
 
 """
 
@@ -24,8 +25,22 @@ activation_cfg = {
     'CELU': nn.CELU,
     # new added
     'Hardswish': nn.Hardswish,  # check pytorch version, >= 1.6
-    'SiLU': nn.SiLU  # check pytorch version, >= 1.7
+    'SiLU': nn.SiLU,  # check pytorch version, >= 1.7
+    'Mish':Mish
 }
+
+
+class Mish(nn.Module):
+    '''
+    Mish: A Self Regularized Non-Monotonic Neural Activation Function [BMVC 2020]
+    Reference - https://www.bmvc2020-conference.com/assets/papers/0928.pdf
+    Original Repository - https://github.com/digantamisra98/Mish
+    '''
+    def __init__(self):
+        super(Mish, self).__init__()
+        
+    def forward(input):
+        return input*torch.tanh(F.softplus(input))
 
 
 def build_activation_layer(cfg):
