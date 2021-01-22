@@ -132,3 +132,46 @@ class CBAM(nn.Module):
         if not self.no_spatial:
             x_out = self.SpatialGate(x_out)
         return x_out
+    
+    
+"""
+Triplet Attention Mechanism
+Reference: https://openaccess.thecvf.com/content/WACV2021/html/Misra_Rotate_to_Attend_Convolutional_Triplet_Attention_Module_WACV_2021_paper.html
+Code taken from: https://github.com/LandskapeAI/triplet-attention
+Reused modules from CBAM written above. Triplet can also be inserted into residual blocks. 
+"""
+    
+    
+class AttentionGate(nn.Module):
+    def __init__(self):
+        super(AttentionGate, self).__init__()
+        kernel_size = 7
+        self.compress = ChannelPool()
+        self.conv = BasicConv(2, 1, kernel_size, stride=1, padding=(kernel_size-1) // 2, relu=False)
+    def forward(self, x):
+        x_compress = self.compress(x)
+        x_out = self.conv(x_compress)
+        scale = torch.sigmoid_(x_out) 
+        return x * scale
+
+class TripletAttention(nn.Module):
+    def __init__(self, no_spatial=False):
+        super(TripletAttention, self).__init__()
+        self.cw = AttentionGate()
+        self.hc = AttentionGate()
+        self.no_spatial=no_spatial
+        if not no_spatial:
+            self.hw = AttentionGate()
+    def forward(self, x):
+        x_perm1 = x.permute(0,2,1,3).contiguous()
+        x_out1 = self.cw(x_perm1)
+        x_out11 = x_out1.permute(0,2,1,3).contiguous()
+        x_perm2 = x.permute(0,3,2,1).contiguous()
+        x_out2 = self.hc(x_perm2)
+        x_out21 = x_out2.permute(0,3,2,1).contiguous()
+        if not self.no_spatial:
+            x_out = self.hw(x)
+            x_out = 1/3 * (x_out + x_out11 + x_out21)
+        else:
+            x_out = 1/2 * (x_out11 + x_out21)
+        return x_out
