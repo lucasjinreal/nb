@@ -14,6 +14,21 @@ on final metric is not so big maybe??
 
 """
 
+
+class Mish(nn.Module):
+    '''
+    Mish: A Self Regularized Non-Monotonic Neural Activation Function [BMVC 2020]
+    Reference - https://www.bmvc2020-conference.com/assets/papers/0928.pdf
+    Original Repository - https://github.com/digantamisra98/Mish
+    '''
+
+    def __init__(self):
+        super(Mish, self).__init__()
+
+    def forward(input):
+        return input*torch.tanh(F.softplus(input))
+
+
 activation_cfg = {
     # layer_abbreviation: module
     'ReLU': nn.ReLU,
@@ -26,21 +41,8 @@ activation_cfg = {
     # new added
     'Hardswish': nn.Hardswish,  # check pytorch version, >= 1.6
     'SiLU': nn.SiLU,  # check pytorch version, >= 1.7
-    'Mish':Mish
+    'Mish': Mish
 }
-
-
-class Mish(nn.Module):
-    '''
-    Mish: A Self Regularized Non-Monotonic Neural Activation Function [BMVC 2020]
-    Reference - https://www.bmvc2020-conference.com/assets/papers/0928.pdf
-    Original Repository - https://github.com/digantamisra98/Mish
-    '''
-    def __init__(self):
-        super(Mish, self).__init__()
-        
-    def forward(input):
-        return input*torch.tanh(F.softplus(input))
 
 
 def build_activation_layer(cfg):
@@ -56,7 +58,7 @@ def build_activation_layer(cfg):
     """
     assert isinstance(cfg, dict) and 'type' in cfg
     cfg_ = cfg.copy()
-    
+
     layer_type = cfg_.pop('type')
     if layer_type not in activation_cfg:
         raise KeyError('Unrecognized activation type {}'.format(layer_type))
