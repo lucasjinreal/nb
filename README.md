@@ -1,6 +1,6 @@
 # NB
 
-Nenural network Blocks (aka: **NB**, or neural network builder). This library provides massive fancy blocks for you for quick import to build your powerful. Some SOTA tricks and connections such as CSP, ASFF, Attention, BaseConv, Hardswish, all included for quick prototype your model.
+Nenural network Blocks (aka: **NB**, or neural network builder). This library provides massive fancy blocks for you for quick import to build your powerful. Some SOTA tricks and connections such as CSP, ASFF, Attention, BaseConv, Hardswish, Mish all included for quick prototype your model. This is an **Arsenal for deeplearning forge**.
 
 **nb** is an idea comes from engineering, we build model with some common blocks, we exploring new ideas with SOTA tricks, but all those thing can be gathered into one single place, and for model quick design and prototyping.
 
@@ -138,6 +138,46 @@ from nb.torch.backbones.mobilenetv3_new import MobilenetV3_Small
 
 
 ## Updates
+
+- **2021.03.16** Added some blocks used inside Scaled-YoloV4 (P5,P6,P7). List are:
+  
+  - `HarDBlock`;
+  - `SPPCSP`;
+  - `VoVCSP`;
+  
+  You can using these blocks to stack your model now.
+  
+  ```python
+  from nb.torch.blocks.csp_blocks import VoVCSP
+  ```
+  
+  
+  
+- **2021.01.22**: Adding Mish activation function. You can call it in your model using the following code:
+  
+  ```python
+  from nb.torch.base import build_activation_layer
+  act = build_activation_layer(act_cfg=dict(type='Mish'))
+  ```
+  
+- **2021.01.22**: Adding Triplet Attention Mechanism. You can plug it in any of your conv net blocks using the following code:
+  
+  ```python
+  from nb.torch.blocks.attention_blocks import TripletAttention
+  att_mechanism = TripletAttention()
+  rand_tensor = torch.rand(1,3,32,32)
+  output = att_mechanism(rand_tensor)
+  ```
+TripletAttention is a shape preserving tensor which expects a 4-dimensional input (B,C,H,W) and outputs a 4-dimensional output of the same shape (B,C,H,W).
+  
+- **2021.01.14**: Adding SiLU introduced from pytorch 1.7. And now you can build a activation layer by using:
+
+  ```python
+  from nb.torch.base import build_activation_layer
+  act = build_activation_layer(act_cfg=dict(type='SiLU'))
+  ```
+
+  Also PANet module also provided now. BiFPN is on the way. We will also provide more examples on how to using it!
 
 - **2020.09.28**: ASFF module added inside **nb**. We have a ASFF design version of YoloV5 now! Some experiment will add here once we confirm ASFF module enhance the model performance.
 
