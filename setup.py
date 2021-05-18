@@ -35,7 +35,7 @@ with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='nbnb',
-      version='0.1.0',
+      version='0.1.1',
       keywords=['deep learning', 'neural network', 'builder'],
       description='''
       nb is nerual network builder for quick network prototyping
