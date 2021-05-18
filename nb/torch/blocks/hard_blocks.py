@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import collections
+from .conv_blocks import ConvBase
 
 
 class CombConvLayer(nn.Sequential):
@@ -86,7 +87,8 @@ class HarDBlock(nn.Module):
             if dwconv:
                 layers_.append(CombConvLayer(inch, outch))
             else:
-                layers_.append(Conv(inch, outch, k=3))
+                layers_.append(ConvBase(inch, outch,
+                                        1, act_cfg=dict(type='LeakyReLU'), norm_cfg=dict(type='BN')))
 
             if (i % 2 == 0) or (i == n_layers - 1):
                 self.out_channels += outch
