@@ -26,7 +26,7 @@ class SPPCSP(nn.Module):
         self.cv6 = ConvBase(c_, c_, 3, 1, norm_cfg=dict(
             type="BN"), act_cfg=dict(type="Mish"))
         self.bn = nn.BatchNorm2d(2 * c_)
-        self.act = Mish()
+        self.act = build_activation_layer(act_cfg=dict(type="Mish"))
         self.cv7 = ConvBase(
             2 * c_, c2, 1, 1, norm_cfg=dict(type="BN"), act_cfg=dict(type="Mish"))
 
@@ -49,7 +49,7 @@ class BottleneckCSP2(nn.Module):
         self.cv3 = ConvBase(
             2 * c_, c2, 1, 1, norm_cfg=dict(type="BN"), act_cfg=dict(type="Mish"))
         self.bn = nn.BatchNorm2d(2 * c_)
-        self.act = Mish()
+        self.act = build_activation_layer(act_cfg=dict(type="Mish"))
         self.m = nn.Sequential(
             *[Bottleneck(c_, c_, shortcut, g, e=1.0) for _ in range(n)])
 
