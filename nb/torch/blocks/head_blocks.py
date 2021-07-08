@@ -4,7 +4,7 @@ import torch
 from .conv_blocks import ConvBase
 from ..base import build_norm_layer, build_activation_layer
 from .trans_blocks import Downsample, Upsample
-from .base import Mish
+from ..base import Mish
 
 
 """
