@@ -1,33 +1,28 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
-
-"""
-
-We define a activation layer
-by a simple cfg
+import logging
 
 
-Do u know which activation func is better?
+try:
+    from mish_cuda import MishCuda as Mish
+except Exception:
+    logger = logging.getLogger(__name__)
+    logger.warning(
+        "Install mish-cuda to speed up training and inference. More "
+        "importantly, replace the naive Mish with MishCuda will give a "
+        "~1.5G memory saving during training."
+    )
 
-ReLU is the base, others just too fancy, their impact
-on final metric is not so big maybe??
+    def mish(x):
+        return x.mul(F.softplus(x).tanh())
 
-"""
+    class Mish(nn.Module):
+        def __init__(self):
+            super(Mish, self).__init__()
 
-
-class Mish(nn.Module):
-    '''
-    Mish: A Self Regularized Non-Monotonic Neural Activation Function [BMVC 2020]
-    Reference - https://www.bmvc2020-conference.com/assets/papers/0928.pdf
-    Original Repository - https://github.com/digantamisra98/Mish
-    '''
-
-    def __init__(self):
-        super(Mish, self).__init__()
-
-    def forward(input):
-        return input*torch.tanh(F.softplus(input))
+        def forward(self, x):
+            return mish(x)
 
 
 class SwishImplementation(torch.autograd.Function):

@@ -4,6 +4,7 @@ import torch
 from .conv_blocks import ConvBase
 from ..base import build_norm_layer, build_activation_layer
 from .trans_blocks import Downsample, Upsample
+from .base import Mish
 
 
 """
@@ -34,7 +35,28 @@ class SPP(nn.Module):
         return self.cv2(torch.cat([x] + [m(x) for m in self.m], 1))
 
 
+class SPPCSP(nn.Module):
+    # CSP SPP https://github.com/WongKinYiu/CrossStagePartialNetworks
+    def __init__(self, c1, c2, n=1, shortcut=False, g=1, e=0.5, k=(5, 9, 13)):
+        super(SPPCSP, self).__init__()
+        c_ = int(2 * c2 * e)  # hidden channels
+        self.cv1 = ConvBase(c1, c_, 1, 1)
+        self.cv2 = nn.Conv2d(c1, c_, 1, 1, bias=False)
+        self.cv3 = ConvBase(c_, c_, 3, 1)
+        self.cv4 = ConvBase(c_, c_, 1, 1)
+        self.m = nn.ModuleList(
+            [nn.MaxPool2d(kernel_size=x, stride=1, padding=x // 2) for x in k])
+        self.cv5 = ConvBase(4 * c_, c_, 1, 1)
+        self.cv6 = ConvBase(c_, c_, 3, 1)
+        self.bn = nn.BatchNorm2d(2 * c_)
+        self.act = Mish()
+        self.cv7 = ConvBase(2 * c_, c2, 1, 1)
 
+    def forward(self, x):
+        x1 = self.cv4(self.cv3(self.cv1(x)))
+        y1 = self.cv6(self.cv5(torch.cat([x1] + [m(x1) for m in self.m], 1)))
+        y2 = self.cv2(x)
+        return self.cv7(self.act(self.bn(torch.cat((y1, y2), dim=1))))
 
 
 class PANet(nn.Module):
