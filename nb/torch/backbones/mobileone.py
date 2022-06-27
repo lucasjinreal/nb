@@ -1,4 +1,5 @@
 """
+In a [op, c, s, n]
     "MobileOne-S0-Deploy": {
         "input_size": 224,
         "basic_args": BASIC_ARGS,
@@ -85,27 +86,67 @@ import torch
 from torch.nn import Module
 from torch import nn
 
+from nb.torch.backbones.layers.mobileone_block import MobileOneBlock
+
 
 class MobileOne(Module):
-    def __init__(self,
-                 width_mult=1.0,
-                 depth_mult=1.0,
-                 dropout_rate=0.2,
-                 num_classes=1000,
-                 features_indices=[1, 4, 10, 15],
-                 bn_mom=0.99,
-                 bn_eps=1e-3
-                 ):
+    def __init__(
+        self,
+        num_classes=1000,
+        deploy_mode=False,
+        for_classification=True,
+    ):
         super(MobileOne, self).__init__()
         self.num_classes = num_classes
-        self.extract_features = num_classes <= 0
-        # stride=2:  ----> block 1 ,3, 5 ,11
-        self.return_features_indices = features_indices
-        out_feature_channels = []
-        out_feature_strides = [4, 8, 16, 32]
-       
+        self.for_classification = for_classification
+
+        cfg_s1 = [
+            [("mobileone", 96, 2, 1, {"over_param_branches": 1})],
+            [("mobileone", 96, 2, 2, {"over_param_branches": 1})],
+            [("mobileone", 192, 2, 8, {"over_param_branches": 1})],
+            [("mobileone", 512, 2, 5, {"over_param_branches": 1})],
+            [("mobileone", 512, 1, 5, {"over_param_branches": 1})],
+            [("mobileone", 1280, 2, 1, {"over_param_branches": 1})],
+            [
+                ("adaptive_avg_pool", 1280, 1, 1, {"output_size": 1}),
+                ("conv_k1", 1280, 1, 1, {"bias": False}),
+            ],
+        ]
+
+        if not for_classification:
+            # discard last fc layer
+            cfg_s1 = cfg_s1[:-1]
+
+        in_channels = 3
+        _blocks = nn.ModuleList([])
+        num_block = 0
+        for l_cfg in cfg_s1:
+            _, c, s, n, _ = l_cfg[0]
+            out_channels = c
+            for i in range(n):
+                _blocks.append(
+                    MobileOneBlock(
+                        in_channels,
+                        out_channels,
+                        stride=s,
+                        deploy=deploy_mode
+                    )
+                )
+                in_channels = out_channels
+                num_block += 1
+        self._blocks = _blocks
+
+        if for_classification:
+            self.avg_pool = nn.AdaptiveAvgPool2d(output_size=1)
+            self.conv_k1 = nn.Conv2d(1280, 1280, 1)
+
 
     def forward(self, x):
-        pass
+        for i, block in enumerate(self._blocks):
+            x = block(x)
+        if self.for_classification:
+            x = self.avg_pool(x)
+            x = self.conv_k1(x)
+        
+        return x
 
-   

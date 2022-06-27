@@ -5,7 +5,6 @@ import torch.fx
 import torch.nn as nn
 from .batchnorm import (
     FrozenBatchNorm2d,
-    GroupNorm,
     NaiveSyncBatchNorm,
     NaiveSyncBatchNorm1d,
     NaiveSyncBatchNorm3d,
@@ -15,6 +14,7 @@ from torch.nn.quantized.modules import FloatFunctional
 from .blur_pool import BlurPool2d as BlurPool
 from ...utils import helper as hp
 from alfred import logger
+from ...utils import iter_utils as iu
 
 # needed for SE module with fx tracing
 torch.fx.wrap("len")
@@ -300,7 +300,7 @@ def build_bn(name, num_channels, zero_gamma=None, gamma_beta=None, **kwargs):
         # any dimension
         "sync_bn_torch": lambda: _create_bn(nn.SyncBatchNorm),
         # others
-        "gn": lambda: GroupNorm(num_channels=num_channels, **kwargs),
+        "gn": lambda: nn.GroupNorm(num_channels=num_channels, **kwargs),
         "instance": lambda: nn.InstanceNorm2d(num_channels, **kwargs),
         "frozen_bn": lambda: FrozenBatchNorm2d(num_channels, **kwargs),
     }
