@@ -31,36 +31,42 @@ import io
 from os import path
 
 this_directory = path.abspath(path.dirname(__file__))
-with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+with io.open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
-setup(name='nbnb',
-      version='0.1.1',
-      keywords=['deep learning', 'neural network', 'builder'],
-      description='''
+version_file = "nb/version.py"
+
+
+def get_version():
+    with open(version_file, "r") as f:
+        exec(compile(f.read(), version_file, "exec"))
+    return locals()["__version__"]
+
+
+setup(
+    name="nbnb",
+    version=get_version(),
+    keywords=["deep learning", "neural network", "builder"],
+    description="""
       nb is nerual network builder for quick network prototyping
-      ''',
-      long_description=long_description,
-      long_description_content_type='text/markdown',
-      license='Apache 2.0',
-      packages=[
-          'nb',
-          'nb.torch',
-          'nb.torch.backbones',
-          'nb.torch.base',
-          'nb.torch.blocks',
-          'nb.torch.utils',
-          'nb.tf'
-      ],
-      entry_points={
-          'console_scripts': [
-              'nb = nb.nb:main'
-          ]
-      },
-      include_package_data=True,
-      author="Lucas Jin",
-      author_email="jinfagang19@163.com",
-      url='https://github.com/jinfagang/nb',
-      platforms='any',
-      install_requires=['colorama', 'requests', 'regex']
-      )
+      """,
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    license="Apache 2.0",
+    packages=[
+        "nb",
+        "nb.torch",
+        "nb.torch.backbones",
+        "nb.torch.base",
+        "nb.torch.blocks",
+        "nb.torch.utils",
+        "nb.tf",
+    ],
+    entry_points={"console_scripts": ["nb = nb.nb:main"]},
+    include_package_data=True,
+    author="Lucas Jin",
+    author_email="jinfagang19@163.com",
+    url="https://github.com/jinfagang/nb",
+    platforms="any",
+    install_requires=["colorama", "requests", "regex", 'rich'],
+)
