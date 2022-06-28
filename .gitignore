@@ -10,3 +10,4 @@ vendor/
 *.pyc
 *.egg-info/
 
+weights/

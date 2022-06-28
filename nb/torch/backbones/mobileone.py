@@ -350,13 +350,14 @@ class MobileOneNet(nn.Module):
                 module.append(block)
             setattr(self, f"stage{idx}", nn.Sequential(*module))
 
-        self.avg_pool = nn.AdaptiveAvgPool2d(1)
-        self.fc1 = nn.Sequential(
-            nn.Linear(
-                out_channels,
-                num_classes,
-            ),
-        )
+        if num_classes is not None:
+            self.avg_pool = nn.AdaptiveAvgPool2d(1)
+            self.fc1 = nn.Sequential(
+                nn.Linear(
+                    out_channels,
+                    num_classes,
+                ),
+            )
 
     def forward(self, x):
         # for s_idx in range(self.stage_num):
