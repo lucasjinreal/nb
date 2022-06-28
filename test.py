@@ -14,11 +14,17 @@ model = make_mobileone_s0(deploy=False)
 model.load_state_dict(sd)
 print("original model loaded.")
 
+n_f0 = os.path.join(
+    os.path.dirname(a), os.path.basename(a).split(".")[0] + "_noreparam.pt"
+)
+mod = torch.jit.trace(model, x)
+mod.save(n_f0)
+
+o1 = model(x)
+
 for module in model.modules():
     if hasattr(module, "switch_to_deploy"):
         module.switch_to_deploy()
-
-o1 = model(x)
 
 deploy_model = make_mobileone_s0(deploy=True)
 deploy_model.eval()
