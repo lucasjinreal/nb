@@ -14,16 +14,12 @@ this project is under construct for now, I will update it quickly once I found s
 
 ## Updates
 
-- ***2022.06.29***: Now we add `EfficientFormer` (unofficial) support! Also, inside YOLOv7, will have a **detection model** trained with EfficientFormer-L1;
+- ***2022.06.29***: Now we add `EfficientFormer` (unofficial) support! Also, inside [YOLOv7](https://github.com/jinfagang/yolov7.git), will have a **detection model** trained with EfficientFormer-L1;
 - ***2022.06.27***: Now we add `MobileOne` backbone support!
 - ***2021.03.16***: Added some blocks used inside Scaled-YoloV4 (P5,P6,P7). List are:
   - `HarDBlock`;
   - `SPPCSP`;
   - `VoVCSP`;
-  You can using these blocks to stack your model now.
-  ```python
-  from nb.torch.blocks.csp_blocks import VoVCSP
-  ```
 
 
 ## Install
