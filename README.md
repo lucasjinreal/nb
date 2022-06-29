@@ -4,7 +4,7 @@
 > Please install `nb` with `pip install nbnb`, the `nb` name was taken already, so we using `nbnb` instead!
 
 
-Nenural network Blocks (aka: **NB**, or neural network builder). This library provides massive fancy blocks for you to quick build your powerful networks! Some SOTA tricks and connections such as CSP, ASFF, Attention, BaseConv, Hardswish, Mish all included for quick prototype your model. This is an **Arsenal for deeplearning forge**.
+Neural Network Blocks (aka: **NB**, or neural network builder). This library provides massive fancy blocks for you to quick build your powerful networks! Some SOTA tricks and connections such as CSP, ASFF, Attention, BaseConv, Hardswish, Mish all included for quick prototype your model. This is an **Arsenal for deeplearning forge**.
 
 **nb** is an idea comes from engineering, we build model with some common blocks, we exploring new ideas with SOTA tricks, but all those thing can be gathered into one single place, and for model quick design and prototyping.
 
@@ -14,69 +14,15 @@ this project is under construct for now, I will update it quickly once I found s
 
 ## Updates
 
-- **2022.06.27**: Now we add `MobileOne` backbone support!
-- **2021.03.16**: Added some blocks used inside Scaled-YoloV4 (P5,P6,P7). List are:
+- ***2022.06.29***: Now we add `EfficientFormer` (unofficial) support! Also, inside YOLOv7, will have a **detection model** trained with EfficientFormer-L1;
+- ***2022.06.27***: Now we add `MobileOne` backbone support!
+- ***2021.03.16***: Added some blocks used inside Scaled-YoloV4 (P5,P6,P7). List are:
   - `HarDBlock`;
   - `SPPCSP`;
   - `VoVCSP`;
   You can using these blocks to stack your model now.
-  
   ```python
   from nb.torch.blocks.csp_blocks import VoVCSP
-  ```
-- **2021.01.22**: Adding Mish activation function. You can call it in your model using the following code:
-  
-  ```python
-  from nb.torch.base import build_activation_layer
-  act = build_activation_layer(act_cfg=dict(type='Mish'))
-  ```
-  
-- **2021.01.22**: Adding Triplet Attention Mechanism. You can plug it in any of your conv net blocks using the following code:
-  
-  ```python
-  from nb.torch.blocks.attention_blocks import TripletAttention
-  att_mechanism = TripletAttention()
-  rand_tensor = torch.rand(1,3,32,32)
-  output = att_mechanism(rand_tensor)
-  ```
-TripletAttention is a shape preserving tensor which expects a 4-dimensional input (B,C,H,W) and outputs a 4-dimensional output of the same shape (B,C,H,W).
-  
-- **2021.01.14**: Adding SiLU introduced from pytorch 1.7. And now you can build a activation layer by using:
-
-  ```python
-  from nb.torch.base import build_activation_layer
-  act = build_activation_layer(act_cfg=dict(type='SiLU'))
-  ```
-
-  Also PANet module also provided now. BiFPN is on the way. We will also provide more examples on how to using it!
-
-- **2020.09.28**: ASFF module added inside **nb**. We have a ASFF design version of YoloV5 now! Some experiment will add here once we confirm ASFF module enhance the model performance.
-
-- **2020.09.22**: New backbone of `Ghostnet` and `MobilenetV3` included. Both of them can be used to replace any of your application's backbone.
-
-- **2020.09.14**: We release a primary version of 0.04, which you can build a simple YoloV5 with **nb** easily!
-
-  ```shell
-  pip install nbnb
-  ```
-  
-- **2020.09.12**: New backbone SpineNet added:
-
-  SpineNet is a backbone model specific for detection, it's a backbone but can do FPN's thing!! More info pls reference google's paper [link](https://ai.googleblog.com/2020/06/spinenet-novel-architecture-for-object.html).
-  
-  ```python
-  from nb.torch.bakbones.spinenet import SpineNet
-  
-  model = SpineNet()
-  ```
-  
-- **2020.09.11**: New added blocks:
-
-  ```
-  resnet.Bottleneck
-  resnet.BasicBlock
-  
-  ConvBase
   ```
 
 
@@ -188,37 +134,15 @@ a = ConvBase(128, 256, 3, 1, 2, norm_cfg=dict(type="BN"), act_cfg=dict(type="Har
 ```
 Be note that, the reason for us using `cfg` to specific norm and activation is for users dynamically switch their configuration of model in yaml format rather than hard code it.
 
-A simple example of using GhostNet:
 
-```python
-from nb.torch.backbones.ghostnet import GhostNet
+## RoadMap
 
-m = GhostNet(num_classes=8)
-
-# if you want FPN output
-m = GhostNet(fpn_levels=[4, 5, 6])
-```
-
-A simple example of using MobilenetV3:
-
-```python
-from nb.torch.backbones.mobilenetv3_new import MobilenetV3_Small
-```
-
-
-## Support Matrix
-
-We list all `conv` and `block` support in **nb** here:
-
-- `conv`:
-  - Conv
-  - ConvWS: https://arxiv.org/pdf/1903.10520.pdf
-  - ...
-- `Blocks`:
-  - CSPBlock: 
+- More Transformers backbone;
+- Favor of more light-weighted but powerful models;
+- Pull request are very welcomed!
 
 
 
 ## Copyright
 
-@Lucas Jin all rights reserved.
+Lucas Jin @2022 all rights reserved.
