@@ -11,3 +11,4 @@ vendor/
 *.egg-info/
 
 weights/
+.DS_Store
